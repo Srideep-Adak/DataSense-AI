@@ -1,6 +1,6 @@
 <div align="center">
 
-# 📊 DataSense
+# 📊 DataSense-AI
 
 ### *Ask Data. Get Answers. No Code.*
 
@@ -9,17 +9,19 @@
 ![Streamlit](https://img.shields.io/badge/Streamlit-App-red.svg)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-**DataSense** is an AI-powered natural-language data analysis assistant that transforms your datasets into meaningful insights, visualizations, and actionable answers — without requiring you to write code.
+**DataSense-AI** is an AI-powered natural-language data analysis assistant that transforms datasets into meaningful insights, visualizations, and actionable answers — without requiring users to write code.
+
+**Developed by Srideep Adak**
 
 </div>
 
 ---
 
-## 📌 Overview
+## 🎯 Overview
 
-**DataSense** is a Streamlit-based data analysis platform that allows users to interact with CSV and Excel datasets using **natural language**.
+**DataSense-AI** is a Streamlit-based intelligent data analysis platform that allows users to interact with **CSV and Excel datasets using natural language**.
 
-Instead of writing Python or SQL queries, users can simply upload their data and ask questions such as:
+Instead of writing Python or SQL queries, users can simply upload their dataset and ask questions such as:
 
 > *"What is the average revenue by country?"*
 
@@ -27,15 +29,15 @@ Instead of writing Python or SQL queries, users can simply upload their data and
 
 > *"Create a line chart showing monthly revenue."*
 
-DataSense uses AI models to understand the user's request, perform the required data analysis, and present the results through **tables, statistics, and visualizations**.
+DataSense-AI uses Large Language Models (LLMs) to understand user requests, perform data analysis, generate visualizations, and provide meaningful insights.
 
 ---
 
-## ✨ Key Features
+## ✨ Features
 
 ### 📈 1. Automated Exploratory Data Analysis
 
-Get an instant overview of your dataset without manually performing EDA.
+DataSense-AI automatically performs comprehensive EDA on uploaded datasets.
 
 **Features include:**
 
@@ -57,9 +59,9 @@ Get an instant overview of your dataset without manually performing EDA.
 
 ### 💬 2. Natural Language Query
 
-Interact with your dataset using plain English.
+Interact with your dataset using plain English instead of writing code.
 
-DataSense converts natural-language questions into data operations and returns results based on the actual dataset.
+DataSense-AI processes natural-language questions and performs the required data operations on the uploaded dataset.
 
 **Example queries:**
 
@@ -79,22 +81,21 @@ How has sales changed year-over-year?
 What percentage of orders have missing customer information?
 ```
 
-**Capabilities:**
+**Supported operations include:**
 
 * Filtering
 * Grouping
 * Aggregation
 * Sorting
 * Statistical calculations
-* Multi-step data analysis
-* Real-time computed results
+* Multi-step analysis
 * AI-generated query suggestions
 
 ---
 
 ### 📊 3. AI-Powered Visualization
 
-Generate charts simply by describing what you want.
+Generate visualizations simply by describing what you want.
 
 For example:
 
@@ -102,7 +103,7 @@ For example:
 Create a bar chart showing the top 10 countries by revenue.
 ```
 
-DataSense generates the required visualization code and displays the resulting chart.
+DataSense-AI generates the required visualization code and displays the resulting chart.
 
 **Supported visualizations include:**
 
@@ -115,12 +116,12 @@ DataSense generates the required visualization code and displays the resulting c
 * Distribution plots
 * Comparative charts
 
-Additional features include:
+Additional capabilities:
 
 * AI-generated visualization suggestions
 * Automatic chart generation
 * Generated-code preview
-* Interactive visualization workflow
+* Natural-language chart descriptions
 
 ---
 
@@ -140,9 +141,9 @@ or:
 Keep only name, age, and salary columns and sort by salary descending.
 ```
 
-DataSense generates the corresponding Pandas operations and allows users to preview the changes before applying them.
+DataSense-AI generates the required Pandas operations and allows users to preview the changes before applying them.
 
-**Features:**
+**Features include:**
 
 * Natural-language transformations
 * Column selection
@@ -159,85 +160,86 @@ DataSense generates the corresponding Pandas operations and allows users to prev
 
 ### 🔐 5. Safe Code Execution
 
-Since DataSense generates and executes code dynamically, security is an important part of the application.
+DataSense-AI includes security guardrails for AI-generated code execution.
 
-The platform includes execution guardrails designed to:
+The platform is designed to:
 
 * Restrict potentially dangerous operations
-* Control generated code execution
+* Control generated-code execution
 * Reduce unintended system access
-* Keep data-analysis operations focused on the uploaded dataset
+* Keep operations focused on the uploaded dataset
 
 ---
 
-## 🧠 How DataSense Works
+## 🧠 How DataSense-AI Works
 
 ```text
-             ┌──────────────────┐
-             │   Upload Dataset │
-             │   CSV / Excel    │
-             └────────┬─────────┘
-                      │
-                      ▼
-             ┌──────────────────┐
-             │  Data Processing │
-             │   & Validation   │
-             └────────┬─────────┘
-                      │
-          ┌───────────┼───────────┐
-          │           │           │
-          ▼           ▼           ▼
-       ┌──────┐   ┌───────┐   ┌──────────┐
-       │ EDA  │   │  NLQ  │   │   Data   │
-       │      │   │       │   │Manipulation│
-       └──┬───┘   └───┬───┘   └─────┬────┘
-          │           │              │
-          └───────────┼──────────────┘
-                      ▼
-             ┌──────────────────┐
-             │    AI Model      │
-             │ Gemini / GPT /   │
-             │ Claude           │
-             └────────┬─────────┘
-                      │
-                      ▼
-             ┌──────────────────┐
-             │ Results &        │
-             │ Visualizations   │
-             └──────────────────┘
+                 ┌─────────────────────┐
+                 │    Upload Dataset   │
+                 │     CSV / Excel     │
+                 └──────────┬──────────┘
+                            │
+                            ▼
+                 ┌─────────────────────┐
+                 │  Data Processing &  │
+                 │     Validation      │
+                 └──────────┬──────────┘
+                            │
+              ┌─────────────┼─────────────┐
+              │             │             │
+              ▼             ▼             ▼
+         ┌────────┐    ┌─────────┐   ┌──────────┐
+         │  EDA   │    │   NLQ   │   │ Dataframe│
+         │Analysis│    │ Queries │   │Manipulation│
+         └───┬────┘    └────┬────┘   └─────┬────┘
+             │              │              │
+             └──────────────┼──────────────┘
+                            ▼
+                 ┌─────────────────────┐
+                 │      AI / LLM       │
+                 │ Gemini / GPT /      │
+                 │ Claude              │
+                 └──────────┬──────────┘
+                            │
+                            ▼
+                 ┌─────────────────────┐
+                 │ Results, Insights & │
+                 │   Visualizations    │
+                 └─────────────────────┘
 ```
 
 ---
 
-## 🤖 Supported AI Models
+## 🏗️ System Architecture
 
-DataSense supports multiple AI providers, allowing users to choose the model that best fits their requirements.
-
-| Provider      | Example Model              | Primary Use                   |
-| ------------- | -------------------------- | ----------------------------- |
-| Google Gemini | `gemini-2.5-flash`         | Fast general-purpose analysis |
-| OpenAI        | `gpt-4o-mini`              | Balanced performance and cost |
-| Anthropic     | `claude-3-5-sonnet-latest` | Complex reasoning             |
-
-### Model Flexibility
-
-Compatible models can be configured according to the selected provider.
-
-**OpenAI examples:**
-
-* GPT-4
-* GPT-4 Turbo
-* GPT-4o Mini
-
-**Google examples:**
-
-* Gemini 2.5 Flash
-* Gemini 2.5 Pro
-
-**Anthropic examples:**
-
-* Claude Sonnet
-* Claude Opus
+```text
+User
+ │
+ ▼
+Streamlit Web Interface
+ │
+ ├───────────────┬─────────────────┐
+ ▼               ▼                 ▼
+EDA Module    NLQ Module      Visualization
+ │               │                 │
+ └───────────────┼─────────────────┘
+                 ▼
+          LangChain Framework
+                 │
+       ┌─────────┼─────────┐
+       ▼         ▼         ▼
+    OpenAI    Gemini    Claude
+       │         │         │
+       └─────────┼─────────┘
+                 ▼
+          Pandas / Python
+                 │
+                 ▼
+          Analysis Results
+                 │
+                 ▼
+       Tables / Charts / Insights
+```
 
 ---
 
@@ -246,21 +248,21 @@ Compatible models can be configured according to the selected provider.
 | Technology           | Purpose                      |
 | -------------------- | ---------------------------- |
 | **Python**           | Core application development |
-| **Streamlit**        | Web application interface    |
+| **Streamlit**        | Interactive web interface    |
 | **Pandas**           | Data processing and analysis |
 | **Matplotlib**       | Data visualization           |
 | **Seaborn**          | Statistical visualization    |
-| **LangChain**        | AI and agent integration     |
-| **OpenAI**           | LLM-powered analysis         |
-| **Google Gemini**    | LLM-powered analysis         |
-| **Anthropic Claude** | LLM-powered analysis         |
+| **LangChain**        | LLM and agent integration    |
+| **OpenAI**           | AI-powered analysis          |
+| **Google Gemini**    | AI-powered analysis          |
+| **Anthropic Claude** | AI-powered analysis          |
 
 ---
 
 ## 📁 Project Structure
 
 ```text
-DataSense/
+DataSense-AI/
 │
 ├── app.py
 ├── requirements.txt
@@ -288,32 +290,48 @@ DataSense/
 
 ### Main Components
 
-* **`app.py`** — Main Streamlit application
-* **`model.py`** — AI model initialization and configuration
-* **`io_utils.py`** — CSV and Excel file handling
-* **`eda.py`** — Exploratory data analysis
-* **`suggestions.py`** — AI-generated analytical suggestions
-* **`nlq.py`** — Natural-language query processing
-* **`viz.py`** — AI-powered visualization generation
-* **`df_manip.py`** — AI-assisted dataframe transformation
+| File             | Description                               |
+| ---------------- | ----------------------------------------- |
+| `app.py`         | Main Streamlit application                |
+| `model.py`       | AI model initialization and configuration |
+| `io_utils.py`    | CSV and Excel file handling               |
+| `eda.py`         | Exploratory data analysis                 |
+| `suggestions.py` | AI-generated analytical suggestions       |
+| `nlq.py`         | Natural-language query processing         |
+| `viz.py`         | AI-powered visualization generation       |
+| `df_manip.py`    | AI-assisted dataframe transformation      |
+
+---
+
+## 🤖 Supported AI Models
+
+DataSense-AI supports multiple AI providers.
+
+| Provider         | Example Model              | Use Case                      |
+| ---------------- | -------------------------- | ----------------------------- |
+| Google Gemini    | `gemini-2.5-flash`         | Fast general-purpose analysis |
+| OpenAI           | `gpt-4o-mini`              | Balanced performance and cost |
+| Anthropic Claude | `claude-3-5-sonnet-latest` | Complex reasoning             |
+
+The model can be configured according to the selected provider and application requirements.
 
 ---
 
 ## 📂 Supported File Formats
 
-DataSense currently supports:
+DataSense-AI supports:
 
-* `.csv`
-* `.xlsx`
-* `.xls`
+* **CSV** — `.csv`
+* **Excel** — `.xlsx`
+* **Excel** — `.xls`
 
 ### Recommended Dataset Size
 
 Datasets up to approximately **200 MB** are recommended for smooth operation.
 
-> Performance may vary depending on dataset size, complexity, available system resources, and the selected AI model.
+Performance may vary depending on dataset size, complexity, available system resources, and the selected AI model.
 
-For Excel workbooks containing multiple sheets, the application currently processes the first sheet.
+For Excel workbooks containing multiple sheets, the application processes the first sheet.
 
 ---
 
@@ -321,19 +339,19 @@ For Excel workbooks containing multiple sheets, the application currently proces
 
 ### Prerequisites
 
-Make sure the following are installed:
+Make sure you have:
 
-* Python **3.10 or higher**
+* Python **3.10+**
 * pip
-* An API key from at least one supported AI provider
+* API key from at least one supported AI provider
 
 ---
 
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/DataSense.git
-cd DataSense
+git clone https://github.com/yourusername/DataSense-AI.git
+cd DataSense-AI
 ```
 
 ---
@@ -366,25 +384,23 @@ pip install -r requirements.txt
 
 ### 4. Configure API Keys
 
-Configure the API key for your selected AI provider.
-
-Supported providers include:
+Configure the API key for your preferred AI provider:
 
 * OpenAI
 * Google Gemini
 * Anthropic Claude
 
-Keep API keys private and avoid committing them to GitHub.
+**Important:** Never commit API keys directly to the repository.
 
 ---
 
-### 5. Run DataSense
+### 5. Run the Application
 
 ```bash
 streamlit run app.py
 ```
 
-The application will start locally and can be accessed through the URL provided by Streamlit, typically:
+The application will typically be available at:
 
 ```text
 http://localhost:8501
@@ -399,41 +415,42 @@ http://localhost:8501
 * Analyze sales performance
 * Compare regional revenue
 * Identify business trends
-* Explore customer behavior
-* Generate management-ready visualizations
+* Analyze customer behavior
+* Generate business visualizations
 
 ### 🧑‍💻 Data Science
 
-* Perform rapid exploratory data analysis
+* Perform automated EDA
+* Explore unfamiliar datasets
 * Identify correlations
 * Analyze distributions
-* Explore datasets before modeling
-* Generate visualizations quickly
+* Generate visualizations
+* Perform preliminary data analysis
 
 ### 🔬 Research
 
 * Analyze survey datasets
 * Explore experimental results
-* Identify patterns and relationships
+* Identify relationships between variables
 * Generate statistical summaries
 * Create research visualizations
 
-### 📊 Data Exploration
+### 📊 General Data Exploration
 
-* Ask questions about unfamiliar datasets
-* Find trends and anomalies
-* Clean datasets using natural language
-* Transform data without writing Pandas code
+* Ask questions about datasets
+* Discover trends and patterns
+* Clean data using natural language
+* Transform datasets without writing Pandas code
 
 ---
 
 ## 🔒 Security & Privacy
 
-DataSense is designed with security considerations for AI-generated code execution.
+DataSense-AI is designed with security considerations for AI-generated code execution.
 
 Users should:
 
-* Never expose API keys publicly
+* Keep API keys private
 * Avoid uploading confidential data to third-party AI providers unless appropriate permissions are in place
 * Review generated code before executing transformations
 * Use environment variables or secure configuration for API credentials
@@ -442,7 +459,7 @@ Users should:
 
 ## 🗺️ Future Enhancements
 
-Potential future improvements include:
+Planned or potential improvements include:
 
 * 📌 Support for larger datasets
 * 📌 Interactive dashboard generation
@@ -468,10 +485,14 @@ See the `LICENSE` file for more information.
 
 <div align="center">
 
-### ⭐ DataSense
+## 📊 DataSense-AI
 
-**Ask Data. Get Answers. No Code.**
+### *Ask Data. Get Answers. No Code.*
 
-Made with ❤️ using Python, Streamlit, LangChain, and modern AI models.
+**Developed by Srideep Adak**
+
+Built with ❤️ using Python, Streamlit, LangChain, and modern AI models.
+
+⭐ **Star this repository if you find it useful!**
 
 </div>
