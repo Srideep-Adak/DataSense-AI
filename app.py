@@ -607,7 +607,7 @@ with st.sidebar:
         index=0,
     )
     if provider == "Google Gemini":
-        default_model = "gemini-2.5-flash"
+        default_model = "gemini-3.6-flash"
         key_label = "GOOGLE_API_KEY"
     elif provider == "OpenAI":
         default_model = "gpt-4o-mini"
