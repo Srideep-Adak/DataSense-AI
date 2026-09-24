@@ -430,36 +430,328 @@ that can help a data analyst gain deeper insights into this dataset.
 # ----------------------------
 # NLQ answering: use agent executor to execute pandas code (like NLQ.ipynb)
 # ----------------------------
-def answer_nlq_text(model, df: pd.DataFrame, question: str) -> str:
-    system_prompt = """
-You are a safe data analysis assistant. 
-You are allowed to manipulate data using pandas operations like filtering, grouping, sorting, merging, etc.
-You must **not** execute or suggest any commands that:
-- read, write, or delete files other than explicitly mentioned CSV outputs
-- import or use system libraries (os, sys, subprocess, shutil, socket, requests)
-- run shell commands, install packages, or use eval/exec
-- access the internet or external resources
+# ----------------------------
+# NLQ answering
+# Gemini generates pandas code, which is validated and executed locally.
+# This avoids the LangChain experimental pandas agent/tool-call loop.
+# ----------------------------
 
-If the user asks for something unsafe, politely refuse.
-When answering, provide specific numbers and results from the data, not approximations.
-"""
-    
+ALLOWED_METHODS = {
+    # DataFrame / Series methods
+    "head",
+    "tail",
+    "mean",
+    "median",
+    "sum",
+    "min",
+    "max",
+    "count",
+    "std",
+    "var",
+    "nunique",
+    "value_counts",
+    "groupby",
+    "agg",
+    "aggregate",
+    "sort_values",
+    "sort_index",
+    "reset_index",
+    "dropna",
+    "fillna",
+    "isna",
+    "isnull",
+    "notna",
+    "notnull",
+    "nlargest",
+    "nsmallest",
+    "round",
+    "describe",
+    "quantile",
+    "corr",
+    "duplicated",
+    "drop_duplicates",
+    "replace",
+    "rename",
+    "astype",
+    "between",
+    "isin",
+    "str",
+}
+
+ALLOWED_BUILTINS = {
+    "len": len,
+    "int": int,
+    "float": float,
+    "str": str,
+    "round": round,
+    "abs": abs,
+    "min": min,
+    "max": max,
+    "sum": sum,
+}
+
+BLOCKED_NAMES = {
+    "os",
+    "sys",
+    "subprocess",
+    "shutil",
+    "socket",
+    "requests",
+    "urllib",
+    "pathlib",
+    "open",
+    "eval",
+    "exec",
+    "compile",
+    "__import__",
+    "globals",
+    "locals",
+    "input",
+    "exit",
+    "quit",
+}
+
+def validate_nlq_code(code: str):
+    """
+    Basic AST-based validation for LLM-generated pandas code.
+    Only allows dataframe-oriented operations.
+    """
+
+    import ast
+
     try:
-        # Create the dataframe agent with safety instructions (mirrors NLQ.ipynb)
-        agent = create_pandas_dataframe_agent(
-            model,
-            df,
-            verbose=False,  # Set to True if you want to see tool invocations
-            allow_dangerous_code=True,  # Required for pandas agent
-            agent_type="openai-tools",  # Ensures reasoning with tool use
-            prefix=system_prompt,
-        )
-        result = agent.invoke(question)
-        # Agent returns a dict with 'input' and 'output' keys
-        if isinstance(result, dict):
-            return result.get("output", str(result))
-        return str(result)
+        tree = ast.parse(code, mode="exec")
+    except SyntaxError as e:
+        return False, f"Invalid Python syntax: {e}"
+
+    for node in ast.walk(tree):
+
+        # Completely reject imports
+        if isinstance(node, (ast.Import, ast.ImportFrom)):
+            return False, "Import statements are not allowed."
+
+        # Reject dangerous names
+        if isinstance(node, ast.Name):
+            if node.id in BLOCKED_NAMES:
+                return False, f"Unsafe operation detected: {node.id}"
+
+        # Reject dangerous attribute access
+        if isinstance(node, ast.Attribute):
+            if node.attr.startswith("__"):
+                return False, "Private/dunder attributes are not allowed."
+
+            if node.attr in BLOCKED_NAMES:
+                return False, f"Unsafe operation detected: {node.attr}"
+
+        # Validate function calls
+        if isinstance(node, ast.Call):
+
+            if isinstance(node.func, ast.Name):
+                if node.func.id not in ALLOWED_BUILTINS:
+                    return False, (
+                        f"Function '{node.func.id}' is not allowed."
+                    )
+
+            elif isinstance(node.func, ast.Attribute):
+                if node.func.attr.startswith("__"):
+                    return False, "Private methods are not allowed."
+
+                if node.func.attr not in ALLOWED_METHODS:
+                    return False, (
+                        f"Method '{node.func.attr}' is not allowed."
+                    )
+
+        # Reject lambda/functions/classes
+        if isinstance(
+            node,
+            (
+                ast.Lambda,
+                ast.FunctionDef,
+                ast.AsyncFunctionDef,
+                ast.ClassDef,
+            ),
+        ):
+            return False, "Function or class definitions are not allowed."
+
+        # Reject loops/conditionals
+        if isinstance(
+            node,
+            (
+                ast.For,
+                ast.While,
+                ast.AsyncFor,
+                ast.Try,
+                ast.With,
+                ast.AsyncWith,
+            ),
+        ):
+            return False, "Control-flow operations are not allowed."
+
+    return True, None
+
+
+def clean_generated_code(code: str) -> str:
+    """
+    Removes markdown code fences accidentally returned by Gemini.
+    """
+
+    code = code.strip()
+
+    if code.startswith("```python"):
+        code = code[len("```python"):]
+
+    elif code.startswith("```"):
+        code = code[len("```"):]
+
+    if code.endswith("```"):
+        code = code[:-3]
+
+    return code.strip()
+
+
+def format_nlq_result(result) -> str:
+    """
+    Converts pandas results into something Streamlit can display nicely.
+    """
+
+    if isinstance(result, pd.DataFrame):
+        if result.empty:
+            return "The query returned no rows."
+
+        return result.to_markdown(index=False)
+
+    if isinstance(result, pd.Series):
+        if result.empty:
+            return "The query returned no results."
+
+        return result.to_string()
+
+    if pd.isna(result) if not isinstance(result, (list, dict, tuple)) else False:
+        return "No result was found."
+
+    return str(result)
+
+
+def answer_nlq_text(model, df: pd.DataFrame, question: str) -> str:
+
+    dataframe_details = get_dataframe_details(df, n_rows=5)
+
+    prompt = f"""
+You are the Natural Language Query engine of DataSense-AI.
+
+Your task is to answer the user's question using the pandas DataFrame `df`.
+
+You must generate ONLY executable Python code.
+
+The final answer MUST be stored in a variable named `result`.
+
+IMPORTANT RULES:
+
+1. The dataframe is already available as `df`.
+2. Do NOT import anything.
+3. Do NOT use os, sys, subprocess, shutil, socket, requests,
+   urllib, pathlib, open, eval, exec or any external resource.
+4. Do NOT read or write files.
+5. Do NOT modify the original dataframe.
+6. Do NOT use print().
+7. Do NOT use loops, functions or classes.
+8. Use only pandas DataFrame/Series operations.
+9. The final result must be assigned to `result`.
+10. Return ONLY Python code. No explanation.
+11. Use the actual column names from the dataframe.
+12. Calculate the actual answer from the data.
+
+Useful operations include:
+
+df["column"].mean()
+df["column"].sum()
+df["column"].median()
+df["column"].value_counts()
+df.groupby("column")["value"].mean()
+df.groupby("column")["value"].sum()
+df.sort_values("column", ascending=False).head(5)
+df["column"].nunique()
+df["column"].isna().sum()
+len(df)
+
+Example 1:
+
+User:
+What is the average age?
+
+Code:
+result = df["Age"].mean()
+
+Example 2:
+
+User:
+Show the top 5 countries by revenue.
+
+Code:
+result = (
+    df.groupby("Country")["Revenue"]
+      .sum()
+      .sort_values(ascending=False)
+      .head(5)
+      .reset_index()
+)
+
+Example 3:
+
+User:
+How many customers are there?
+
+Code:
+result = df["Customer"].nunique()
+
+DATAFRAME DETAILS:
+
+{dataframe_details}
+
+USER QUESTION:
+
+{question}
+
+Return ONLY the Python code.
+"""
+
+    try:
+
+        # Gemini only generates code.
+        response = model.invoke(prompt)
+
+        code = response.content
+
+        # Gemini may occasionally return markdown fences.
+        code = clean_generated_code(code)
+
+        # Validate generated code.
+        safe, error = validate_nlq_code(code)
+
+        if not safe:
+            return f"Unsafe query generated by the AI: {error}"
+
+        # Execute in a restricted namespace.
+        safe_globals = {
+            "__builtins__": ALLOWED_BUILTINS
+        }
+
+        safe_locals = {
+            "df": df.copy(),
+            "result": None,
+        }
+
+        exec(code, safe_globals, safe_locals)
+
+        result = safe_locals.get("result")
+
+        if result is None:
+            return "The AI did not generate a result."
+
+        return format_nlq_result(result)
+
     except Exception as e:
+
         return f"Error executing NLQ: {str(e)}"
 
 
